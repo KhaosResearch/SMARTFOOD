@@ -1,18 +1,18 @@
-1. Antes de levantar la web, necesitamos configurar un bucket de Google Cloud Storage con la misma cuenta de Google usada para el `VRE1`. Para ello, vaya a la [consola de Google Cloud](https://console.cloud.google.com/)
-2. En la parte superior de la pantalla, verá: "Comienza tu prueba gratuita con un crédito de $300. No te preocupes, no se te cobrará si se acaban los créditos.", pulse en "Comenzar gratis". 
-3. Configure su cuenta con sus datos personales y su tarjeta de crédito.
-4. Ahora se va a crear un bucket de Google Cloud Storage. Pulse en "Crear" en la parte superior de la pantalla [en la parte de almacenamiento](https://console.cloud.google.com/storage) de la consola de Google Cloud. El nombre del bucket debe ser "parcelas". Seleccione la región de su bucket y pulse "Crear". Saltará un aviso que preguntará si se debe mantener privado el bucket, aseguresé de que "Aplicar la prevención de acceso público a este bucket" está marcado.
-5. Para lanzar la página web, necesitaremos descargar dos credenciales para cuentas de servicio desde la consola de Google Cloud. Para ello, siga los siguientes pasos:
-    1.  En la parte superior de la pantalla, pulse en el icono de la esquina superior izquierda y seleccione "IAM y administración" y luego "Cuentas de servicio".
-    2.  Pulse "crear cuentas de servicio".
-    3.  En "ID de la cuenta de servicio" ponga en la primera cuenta "developer". El resto de campos vacíos.
-    4.  En "Otorga a esta cuenta de servicio acceso al proyecto" seleccione los roles "Agente de servicio de AI Platform", "Editor", "Propietario".
-    5.  Repita los pasos 1-4 cambiando el ID por "storage" y el rol "propietario".
-    6.  En el [menú principal de las cuentas de servicio](https://console.cloud.google.com/iam-admin/serviceaccounts), pulse en cada una de las cuentas de servicio creadas y luego en "Claves", "Agregar clave" y "Crear clave nueva en formato JSON".
-    7.  Renombre el archivo JSON de la cuenta de servicio "developer" a "gee-cli-key.json" y la cuenta de servicio "storage" a "key.json".
-    8.  Mueva ambas claves a una carpeta llamada `credentials/` en el repositorio clonado.
-6. El último requisito para levantar la página web es disponer de un servicio que implemente Oauth 2.0 en el script de Python `oauth.py`. En nuestro caso, se ha usado [Casdoor](https://casdoor.org/docs/how-to-connect/oauth/). En el caso de usar "Casdoor" también, modificar el archivo ".env" con los datos de su cuenta de Casdoor (`CASDOOR_CLIENT_ID` y `CASDOOR_CLIENT_SECRET`). Si se usa otro servicio, modificar el archivo ".env" (valores proporcionados) y "config.py" (valores por defecto) con los datos de su servicio.
-7. Finalmente, vamos a construir y ejecutar la imagen docker que ejecuta la página web con los siguientes comandos desde el directorio principal del repositorio clonado:
+1. Before deploying the website, we need to set up a Google Cloud Storage bucket using the same Google account used for `VRE1`. To do this, go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. At the top of the screen, you will see: "Start your free trial with a $300 credit. Don't worry, you won't be charged if credits run out." Click on "Start for free."
+3. Set up your account with your personal details and credit card information.
+4. Now, a Google Cloud Storage bucket will be created. Click on "Create" at the top of the screen [in the storage section](https://console.cloud.google.com/storage) of the Google Cloud Console. The bucket name should be "parcelas." Select the region for your bucket and click "Create." A prompt will appear asking if the bucket should be kept private, make sure "Apply public access prevention to this bucket" is checked.
+5. To launch the website, we'll need to download two service account credentials from the Google Cloud Console. Follow these steps:
+    1. At the top of the screen, click on the icon in the top left corner and select "IAM & Admin" and then "Service accounts."
+    2. Click on "Create Service Account."
+    3. In "Service Account ID," enter "developer" for the first account. Leave the other fields empty.
+    4. In "Grant this service account access to project," select the roles "AI Platform Service Agent," "Editor," "Owner."
+    5. Repeat steps 1-4 changing the ID to "storage" and the role to "Owner."
+    6. In the [main service accounts menu](https://console.cloud.google.com/iam-admin/serviceaccounts), click on each of the created service accounts and then "Keys", "Add Key", and "Create new key in JSON format".
+    7. Rename the JSON file for the "developer" service account to "gee-cli-key.json" and the "storage" service account to "key.json."
+    8. Move both keys to a folder named `credentials/` in the cloned repository.
+6. The last requirement to deploy the website is to have a service implementing OAuth 2.0 in the Python script `oauth.py`. In our case, we have used [Casdoor](https://casdoor.org/docs/how-to-connect/oauth/). If using "Casdoor," modify the ".env" file with your Casdoor account details (`CASDOOR_CLIENT_ID` and `CASDOOR_CLIENT_SECRET`). If using another service, modify the ".env" file (provided values) and "config.py" (default values) with your service data.
+7. Finally, we'll build and run the Docker image that runs the website with the following commands from the main directory of the cloned repository:
     ```
     docker build -t app_visualizationgee:1.0.0 -f visualizationGEE.dockerfile .
     ```
