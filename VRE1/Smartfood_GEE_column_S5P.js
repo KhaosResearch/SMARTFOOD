@@ -1,5 +1,5 @@
 var s5P = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_O3_TCL"),
-limits = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/limites");;
+sitios = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/sitios");
 
 
 var userIdentifier = null;
@@ -150,6 +150,7 @@ function selectSelectedLocation(){
   ui.root.remove(chartPanel);
   chartPanel.clear();
   mapCordoba.addLayer(S5P_CO, band_viz, 'Sentinel 5sP CO Enero', false)
+  mapCordoba.addLayer(sitios, {}, 'Sitios Andalucia', false)
 
   var addLocation = ee.List([])
   for (var indx in dictionaryInitialValuesLocation) {

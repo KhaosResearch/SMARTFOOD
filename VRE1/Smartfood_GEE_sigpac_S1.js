@@ -1,5 +1,6 @@
 var s1 = ee.ImageCollection("COPERNICUS/S1_GRD"),
-    limits = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/limites");
+    limits = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/limites"),
+    sitios = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/sitios");
 
 var userIdentifier = null;
 var selectedFC = null;
@@ -136,6 +137,7 @@ function selectSelectedLocation(){
   chartPanel.clear();
   mapCordoba.addLayer(limits, {}, 'Limites SigPac', false)
   mapCordoba.addLayer(rgb_january, visParamsS1, 'Sentinel 1 Enero', false)
+  mapCordoba.addLayer(sitios, {}, 'Sitios Andalucia', false)
 
   var addLocation = ee.List([])
   for (var indx in dictionaryInitialValuesLocation) {

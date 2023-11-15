@@ -1,5 +1,5 @@
 var s2 = ee.ImageCollection("COPERNICUS/S2_SR"),
-limits = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/limites");
+sitios = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/sitios");
 
 var userIdentifier = null;
 var selectedFC = null;
@@ -163,6 +163,7 @@ function selectSelectedLocation(){
   chartPanel.clear();
   mapCordoba.addLayer(sentinel5P, visParamsS5P, 'Sentinel 5P NO2 Enero', false)
   mapCordoba.addLayer(sentinel2, visParamsS2, 'Sentinel 2 Enero', false)
+  mapCordoba.addLayer(sitios, {}, 'Sitios Andalucia', false)
 
   var addLocation = ee.List([])
   for (var indx in dictionaryInitialValuesLocation) {

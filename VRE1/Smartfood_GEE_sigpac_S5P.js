@@ -1,5 +1,6 @@
 var limits = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/limites"),
-    s5P = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_O3_TCL");
+    s5P = ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_O3_TCL"),
+    sitios = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/sitios");
 
     var userIdentifier = null;
     var selectedFC = null;
@@ -142,6 +143,7 @@ var limits = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/limite
       chartPanel.clear();
       mapCordoba.addLayer(limits, {}, 'Limites SigPac', false)
       mapCordoba.addLayer(S5P_CO, band_viz, 'Sentinel 5sP CO Enero', false)
+      mapCordoba.addLayer(sitios, {}, 'Sitios Andalucia', false)
     
       var addLocation = ee.List([])
       for (var indx in dictionaryInitialValuesLocation) {
