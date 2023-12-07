@@ -25,33 +25,28 @@ import org.addition.epanet.network.PropertiesMap;
 import org.addition.epanet.network.io.input.InputParser;
 import org.addition.epanet.network.structures.Link;
 import org.addition.epanet.network.structures.Node;
-import org.apache.commons.io.FilenameUtils;
 
-public class RunnerSimulation {
-    public static void main(String[] args) {
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-        // Extract input parameters
-        File inpFile;
-        String outputFilename;
-        File varFile = null;
-        String strVariables = "";
-        if (args.length > 1 && args.length < 5) {
-            inpFile = new File(args[0]);
-            outputFilename = args[1];
-            if (args.length > 3) {
-                varFile = new File(args[2]);
-                strVariables = args[3];
-            }
-        } else {
-            throw new RuntimeException("At least two input parameters must be provided: the path to the INP file with the scenario to be analyzed and output file name");
-        }
+@Command(name = "RunnerSimulation", description = "Your program description here.", mixinStandardHelpOptions = true)
+public class RunnerSimulation implements Runnable {
 
-        // Check output filename extension
-        String extExp = args.length > 3 ? "zip" : "csv";
-        String extPro = FilenameUtils.getExtension(outputFilename);
-        if (! extExp.equals(extPro)){
-            throw new RuntimeException("The extension of the specified output file was not as expected. Provided: " + extPro + ", expected: " + extExp);
-        }
+    @Option(names = {"--inp-file"}, description = "Path to the INP file with the scenario to be analyzed", required = true)
+    private File inpFile;
+
+    @Option(names = {"--output-folder"}, description = "Output folder", defaultValue = "/mnt/shared")
+    private String outputFolder;
+
+    @Option(names = {"--var-file"}, description = "In case you do not want to run the simulation with the values set in the input .inp file, you can replace these values by the values provided in a VAR.csv file as a result of the variable optimization component. (optional)")
+    private File varFile;
+
+    @Option(names = {"--str-variables"}, description = "Semicolon-separated variables whose values are to be replaced by those provided in the VAR.csv file. (optional)")
+    private String strVariables;
+
+    @Override
+    public void run() {
 
         // Create the necessary variables to be able to import the input map
         Logger log = Logger.getLogger("Test EPANET");
@@ -71,7 +66,7 @@ public class RunnerSimulation {
         // Get varfile variables if specified
         int reps = 1;
         double[][] variableValues = new double[0][0];
-        if (args.length > 3) {
+        if (varFile != null || strVariables != null) {
             ArrayList<double[]> tmpVariableValues = new ArrayList<double[]>();
             try {
                 Scanner sc = new Scanner(varFile);
@@ -100,7 +95,7 @@ public class RunnerSimulation {
         for (int i = 0; i < reps; i++) {
 
             // Insert variables if varFile specified
-            if (args.length > 3) {
+            if (varFile != null || strVariables != null) {
                 String[] variables = strVariables.split(";");
                 for (int k = 0; k < variables.length; k++) {
                     Collection<Link> pipes = StaticUtils.getPipesFromNet(net);
@@ -131,13 +126,7 @@ public class RunnerSimulation {
                 hydSim.simulate(hydFile);
 
                 HydraulicReader hydReader = new HydraulicReader(new RandomAccessFile(hydFile, "r"));
-
-                File outputFile = null;
-                if (args.length > 3) {
-                    outputFile = new File(FilenameUtils.removeExtension(outputFilename) + "_" + i + ".csv");
-                } else {
-                    outputFile = new File(outputFilename);
-                }
+                File outputFile = new File("simulated_pressures_" + i + ".csv");
 
                 BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
                 for (Node node : net.getNodes()) {
@@ -158,30 +147,34 @@ public class RunnerSimulation {
         }
 
         // If a varFile has been provided, all csv's are compressed into a single zip file.
-        if (args.length > 3) {
-            try {
-                FileOutputStream fos = new FileOutputStream(outputFilename);
-                ZipOutputStream zos = new ZipOutputStream(fos);
-    
-                for (int i = 0; i < reps; i++) {
-                    String csvFilename = FilenameUtils.removeExtension(outputFilename) + "_" + i + ".csv";
-                    File csvFile = new File(csvFilename);
-                    zos.putNextEntry(new ZipEntry(csvFile.getName()));
-    
-                    byte[] bytes = Files.readAllBytes(Paths.get(csvFilename));
-                    zos.write(bytes, 0, bytes.length);
-                    zos.closeEntry();
+        try {
+            FileOutputStream fos = new FileOutputStream(outputFolder + "/simulated_pressures.zip");
+            ZipOutputStream zos = new ZipOutputStream(fos);
 
-                    csvFile.delete();
-                }
-    
-                zos.close();
-    
-            } catch (FileNotFoundException ex) {
-                System.err.println("A file does not exist: " + ex);
-            } catch (IOException ex) {
-                System.err.println("I/O error: " + ex);
+            for (int i = 0; i < reps; i++) {
+                String csvFilename = "simulated_pressures_" + i + ".csv";
+                File csvFile = new File(csvFilename);
+                zos.putNextEntry(new ZipEntry(csvFile.getName()));
+
+                byte[] bytes = Files.readAllBytes(Paths.get(csvFilename));
+                zos.write(bytes, 0, bytes.length);
+                zos.closeEntry();
+
+                csvFile.delete();
             }
+
+            zos.close();
+
+        } catch (FileNotFoundException ex) {
+            System.err.println("A file does not exist: " + ex);
+        } catch (IOException ex) {
+            System.err.println("I/O error: " + ex);
         }
     }
+
+    public static void main(String[] args) {
+        CommandLine commandLine = new CommandLine(new RunnerSimulation());
+        commandLine.execute(args);
+    }
+
 }

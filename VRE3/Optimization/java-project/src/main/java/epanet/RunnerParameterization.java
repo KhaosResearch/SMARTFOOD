@@ -2,10 +2,18 @@ package epanet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.multiobjective.gde3.GDE3Builder;
 import org.uma.jmetal.algorithm.multiobjective.moead.MOEADBuilder;
@@ -38,50 +46,82 @@ import org.uma.jmetal.solution.doublesolution.DoubleSolution;
 import org.uma.jmetal.util.archive.BoundedArchive;
 import org.uma.jmetal.util.archive.impl.CrowdingDistanceArchive;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
-import org.uma.jmetal.util.errorchecking.JMetalException;
 import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
 
 import epanet.problem.Problem;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-public class RunnerParameterization {
-    private static final int INDEPENDENT_RUNS = 7;
+@Command(name = "RunnerParameterization", description = "Run Parameterization with specified network IDs.", mixinStandardHelpOptions = true)
+public class RunnerParameterization implements Runnable {
 
-    public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            throw new JMetalException("It is necessary to specify at least one problem id");
+    @Option(names = {"--input-zip"}, description = "ZIP file with the different .inp (irrigation systems) and .csv (real pressures). The files will be paired for sharing the same prefix.", required = true)
+    private String inputZip;
+
+    @Option(names = {"--output-dir"}, description = "Folder where the ZIP output file will be generated.", defaultValue = "/mnt/shared/")
+    private String outputDir;
+
+    @Option(names = {"--str-variables"}, description = "Irrigation system variables separated by semicolon that want to be optimized to match real pressures with simulated. Possible values: Roughness, Minorloss", defaultValue = "Roughness;Minorloss")
+    private String strVariables;
+
+    @Option(names = {"--str-var-limits"}, description = "Parts per unit that represents the possible margin of values that each variable can take with respect to the pre-existing ones in the .inp input file. The value -1 represents the absence of limits for the variable in question.", defaultValue = "0.2;-1")
+    private String strVarLimits;
+
+    @Option(names = {"--str-fitness-formulas"}, description = "Objectives to optimize separated by semicolon. Possible values: SSE, SEHomogeneity, RoughnessHomogeneity, MinorlossHomogeneity", defaultValue = "SSE;SEHomogeneity")
+    private String strFitnessFormulas;
+
+    @Option(names = {"--independent-runs"}, description = "Number of independent runs", defaultValue = "7")
+    private int independentRuns;
+
+    @Override
+    public void run() {
+
+        List<File> inpFiles = new ArrayList<>();
+        List<File> pressureFiles = new ArrayList<>();
+        try {
+            ZipFile zipFile = new ZipFile(inputZip);
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+            while(entries.hasMoreElements()){
+                ZipEntry entry = entries.nextElement();
+                String entryName = entry.getName();
+                if (entryName.endsWith(".inp")) {
+                    String pressureFileName = entryName.replace(".inp", "_real_pressures.csv");
+                    if (zipFile.getEntry(pressureFileName) != null) {
+                        File inpFile = new File(System.getProperty("java.io.tmpdir"), entryName);
+                        File pressureFile = new File(System.getProperty("java.io.tmpdir"), pressureFileName);
+                        Files.copy(zipFile.getInputStream(entry), inpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        Files.copy(zipFile.getInputStream(zipFile.getEntry(pressureFileName)), pressureFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        inpFiles.add(inpFile);
+                        pressureFiles.add(pressureFile);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        String[] networkIds = args;
-        String experimentBaseDirectory = "./pareto_fronts";
-
-        File[] inpFiles = new File[networkIds.length];
-        File[] pressureFiles = new File[networkIds.length];
-        for (int i = 0; i < networkIds.length; i++) {
-            inpFiles[i] = new File(networkIds[i] + ".inp");
-            pressureFiles[i] = new File(networkIds[i] + "_real_pressures.csv");
-        }
-
-        String strVariables = "Roughness;Minorloss";
-        String strVarLimits = "0.2;-1";
-        String strFitnessFormulas = "SSE;RoughnessHomogeneity";
-
+        
         List<ExperimentProblem<DoubleSolution>> problemList = new ArrayList<>();
-        for (int i = 0; i < networkIds.length; i++) {
-            Problem problem = new Problem(inpFiles[i], StaticUtils.readPressureFile(pressureFiles[i]), strVariables, strVarLimits, strFitnessFormulas);
-            problem.setName(new File(networkIds[i]).getName());
+        for (int i = 0; i < inpFiles.size(); i++) {
+            Problem problem = new Problem(inpFiles.get(i), StaticUtils.readPressureFile(pressureFiles.get(i)), strVariables, strVarLimits, strFitnessFormulas);
+            problem.setName(FilenameUtils.removeExtension(inpFiles.get(i).getName()));
             problemList.add(new ExperimentProblem<>(problem));
         }
 
         List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithmList =
-            configureAlgorithmList(problemList);
+            configureAlgorithmList(problemList, independentRuns);
 
+        String experimentBaseDirectory = outputDir + "/parameterization";
         Experiment<DoubleSolution, List<DoubleSolution>> experiment =
-                new ExperimentBuilder<DoubleSolution, List<DoubleSolution>>("ComputingReferenceParetoFronts-villar")
+                new ExperimentBuilder<DoubleSolution, List<DoubleSolution>>("ComputingReferenceParetoFronts")
                         .setAlgorithmList(algorithmList)
                         .setProblemList(problemList)
                         .setExperimentBaseDirectory(experimentBaseDirectory)
                         .setOutputParetoFrontFileName("FUN")
                         .setOutputParetoSetFileName("VAR")
-                        .setReferenceFrontDirectory(experimentBaseDirectory + "/ComputingReferenceParetoFronts-villar/referenceFronts")
+                        .setReferenceFrontDirectory(experimentBaseDirectory + "/ComputingReferenceParetoFronts/referenceFronts")
                         .setIndicatorList(Arrays.asList(
                                 new Epsilon(),
                                 new Spread(),
@@ -89,28 +129,57 @@ public class RunnerParameterization {
                                 new PISAHypervolume(),
                                 new InvertedGenerationalDistance(),
                                 new InvertedGenerationalDistancePlus()))
-                        .setIndependentRuns(INDEPENDENT_RUNS)
-                        .setNumberOfCores(Runtime.getRuntime().availableProcessors())
+                        .setIndependentRuns(independentRuns)
+                        .setNumberOfCores(Runtime.getRuntime().availableProcessors() - 1)
                         .build();
 
-        new ExecuteAlgorithms<>(experiment).run();
-        new GenerateReferenceParetoSetAndFrontFromDoubleSolutions(experiment).run();
-        new ComputeQualityIndicators<>(experiment).run();
-        new GenerateLatexTablesWithStatistics(experiment).run();
-        new GenerateFriedmanHolmTestTables<>(experiment).run();
-        new GenerateWilcoxonTestTablesWithR<>(experiment).run();
-        new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
-        new GenerateHtmlPages<>(experiment).run() ;
+        try {
+            new ExecuteAlgorithms<>(experiment).run();
+            new GenerateReferenceParetoSetAndFrontFromDoubleSolutions(experiment).run();
+            new ComputeQualityIndicators<>(experiment).run();
+            new GenerateLatexTablesWithStatistics(experiment).run();
+            new GenerateFriedmanHolmTestTables<>(experiment).run();
+            new GenerateWilcoxonTestTablesWithR<>(experiment).run();
+            new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
+            new GenerateHtmlPages<>(experiment).run() ;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Compress the experiment base folder and delete it
+        try {
+            zipFolder(experimentBaseDirectory, experimentBaseDirectory + ".zip");
+            FileUtils.deleteDirectory(new File(experimentBaseDirectory));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
+    public static void main(String[] args) {
+        CommandLine commandLine = new CommandLine(new RunnerParameterization());
+        commandLine.execute(args);
+    }
+
+    public static void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
+        File sourceFolder = new File(sourceFolderPath);
+        File zipFile = new File(zipFilePath);
+
+        try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(zipFile)) {
+            zos.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
+            FileUtils.copyDirectory(sourceFolder, zipFile);
+            zos.finish();
+        }
     }
 
     static List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> configureAlgorithmList(
-          List<ExperimentProblem<DoubleSolution>> problemList) {
+          List<ExperimentProblem<DoubleSolution>> problemList, int independentRuns) {
 
         List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithms = new ArrayList<>();
         int populationSize = 100;
         int maxEvaluations = 500000;
 
-        for (int run = 0; run < INDEPENDENT_RUNS; run++) {
+        for (int run = 0; run < independentRuns; run++) {
 
             // 1. NSGAII
             for (ExperimentProblem<DoubleSolution> experimentProblem : problemList) {

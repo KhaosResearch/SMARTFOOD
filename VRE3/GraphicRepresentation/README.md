@@ -57,11 +57,11 @@ docker build -t $REGISTRY/smartfood/vre3/graphicrepresentation:1.0.0 .
 Run the image with (assuming that the file is in the `data` folder from the current directory):
 
 ```sh
-docker run --rm $REGISTRY/enbic2lab/misc/graphicrepresentation:1.0.0 --help
+docker run --rm $REGISTRY/smartfood/vre3/graphicrepresentation:1.0.0 --help
 ```
 
 e.g.
 
 ```sh
-docker run --rm -v $(pwd)/data:/mnt/shared/ $REGISTRY/enbic2lab/misc/graphicrepresentation:1.0.0 --fitness-evolution-file data/fitness_evolution.txt --fun-file data/FUN.csv --output-folder data
+docker run --rm -v $(pwd)/data:/mnt/shared/ $REGISTRY/smartfood/vre3/graphicrepresentation:1.0.0 --fitness-evolution-file data/fitness_evolution.txt --fun-file data/FUN.csv --output-folder data
 ```

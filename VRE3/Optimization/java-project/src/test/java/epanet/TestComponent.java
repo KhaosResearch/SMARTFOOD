@@ -20,7 +20,7 @@ import org.uma.jmetal.util.bounds.Bounds;
 import epanet.problem.Problem;
 import io.netty.util.internal.ThreadLocalRandom;
 
-public class TestVariableOptimization {
+public class TestComponent {
     @Test
     void correctSSEEvaluationCasePivot() {
         genericEvaluation(

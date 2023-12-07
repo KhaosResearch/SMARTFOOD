@@ -39,45 +39,54 @@ import epanet.jmetal_modifications.SolutionListOutputWithHeader;
 import epanet.problem.Problem;
 import epanet.problem.ProblemFitnessEvolution;
 
-public class RunnerVariableOptimization {
-    public static void main(String[] args) {
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+@Command(name = "RunnerVariableOptimization", description = "Run Variable Optimization using specified parameters.", mixinStandardHelpOptions = true)
+public class RunnerVariableOptimization implements Runnable {
+
+    @Option(names = {"--inp-file"}, description = "Path to the INP file with the scenario whose variables want to be optimized to match real pressures with simulated.", required = true)
+    private File inpFile;
+
+    @Option(names = {"--pressure-file"}, description = "CSV file with the real pressures of the irrigation system.", required = true)
+    private File pressureFile;
+
+    @Option(names = {"--str-variables"}, description = "Irrigation system variables separated by semicolon that want to be optimized. Possible values: Roughness, Minorloss", defaultValue = "Roughness;Minorloss")
+    private String strVariables;
+
+    @Option(names = {"--str-var-limits"}, description = "Parts per unit that represents the possible margin of values that each variable can take with respect to the pre-existing ones in the .inp input file. The value -1 represents the absence of limits for the variable in question.", defaultValue = "0.2;-1")
+    private String strVarLimits;
+
+    @Option(names = {"--str-fitness-formulas"}, description = "Objectives to optimize separated by semicolon. Possible values: SSE, SEHomogeneity, RoughnessHomogeneity, MinorlossHomogeneity", defaultValue = "SSE;SEHomogeneity;RoughnessHomogeneity")
+    private String strFitnessFormulas;
+
+    @Option(names = {"--population-size"}, description = "Population size", defaultValue = "100")
+    private int populationSize;
+
+    @Option(names = {"--max-evaluations"}, description = "Max number of evaluations", defaultValue = "25000")
+    private int maxEvaluations;
+
+    @Option(names = {"--str-algorithm"}, description = "Algorithm as a string. Possible values: GA-AsyncParallel (mono-objective), NSGAII-AsyncParallel (multi-objective), SMPSO-SyncParallel (multi-objective)", defaultValue = "SMPSO-SyncParallel")
+    private String strAlgorithm;
+
+    @Option(names = {"--crossover-probability"}, description = "Crossover probability", defaultValue = "0.9")
+    private double crossoverProbability;
+
+    @Option(names = {"--mutation-probability"}, description = "Mutation probability", defaultValue = "0.1")
+    private double mutationProbability;
+
+    @Option(names = {"--output-folder"}, description = "Output folder", defaultValue = "/mnt/shared")
+    private String outputFolder;
+
+    @Override
+    public void run() {
         CrossoverOperator<DoubleSolution> crossover;
         MutationOperator<DoubleSolution> mutation;
         NaryTournamentSelection<DoubleSolution> selection ;
         Replacement<DoubleSolution> replacement;
         Termination termination;
         Problem problem;
-
-        File inpFile;
-        File pressureFile;
-        String strVariables;
-        String strVarLimits;
-        String strFitnessFormulas;
-        int populationSize;
-        int maxEvaluations;
-        String strAlgorithm;
-        double crossoverProbability;
-        double mutationProbability;
-        String outVarFile;
-        String outFunFile;
-        String outFitnessEvolutionFile;
-        if (args.length == 13) {
-            inpFile = new File(args[0]);
-            pressureFile = new File(args[1]);
-            strVariables = args[2];
-            strVarLimits = args[3];
-            strFitnessFormulas = args[4];
-            populationSize = Integer.parseInt(args[5]);
-            maxEvaluations = Integer.parseInt(args[6]);
-            strAlgorithm = args[7];
-            crossoverProbability = Double.parseDouble(args[8]);
-            mutationProbability = Double.parseDouble(args[9]);
-            outVarFile = args[10];
-            outFunFile = args[11];
-            outFitnessEvolutionFile = args[12];
-        } else {
-            throw new RuntimeException("13 input parameters must be provided: inpFile, pressureFile, strVariables, strVarLimits, strFitnessFormulas, populationSize, maxEvaluations, strAlgorithm, crossoverProbability, mutationProbability, outVarFile, outFunFile and outFitnessEvolutionFile.");
-        }
 
         /** Set number of threads */
         int numOfThreads = Runtime.getRuntime().availableProcessors();
@@ -110,7 +119,7 @@ public class RunnerVariableOptimization {
 
         /** Configure the specified evolutionary algorithm. */
         if (problem.getNumberOfObjectives() == 1) {
-            if (strAlgorithm.equals("GA-AsyncParallel")) {
+            if (strAlgorithm.equals("GA-SingleThread")) {
                 /** Instantiate the evolutionary algorithm. */
                 GeneticAlgorithm<DoubleSolution> algorithm = new GeneticAlgorithm<DoubleSolution>(
                         problem,
@@ -263,16 +272,21 @@ public class RunnerVariableOptimization {
         }
         
         new SolutionListOutputWithHeader(population, strFitnessFormulas.split(";"), problem.getPipesIds(), problem.roughnessFactor, diameters, problem.getOrder())
-            .setVarFileOutputContext(new DefaultFileOutputContext(outVarFile, ","))
-            .setFunFileOutputContext(new DefaultFileOutputContext(outFunFile, ","))
+            .setVarFileOutputContext(new DefaultFileOutputContext(outputFolder + "/VAR.csv", ","))
+            .setFunFileOutputContext(new DefaultFileOutputContext(outputFolder + "/FUN.csv", ","))
             .print();
 
         Map<String, Double[]> fitnessEvolution = ((ProblemFitnessEvolution) problem).getFitnessEvolution();
-        StaticUtils.writeFitnessEvolution(outFitnessEvolutionFile, fitnessEvolution);
+        StaticUtils.writeFitnessEvolution(outputFolder + "/fitness_evolution.txt", fitnessEvolution);
 
         System.out.println("Threads used: " + numOfThreads);
         System.out.println("Total execution time: " + computingTime + "ms");
             
         System.exit(0);
+    }
+
+    public static void main(String[] args) {
+        CommandLine commandLine = new CommandLine(new RunnerVariableOptimization());
+        commandLine.execute(args);
     }
 }
