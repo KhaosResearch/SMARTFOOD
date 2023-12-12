@@ -1,0 +1,93 @@
+{
+  "type": "DataAnalysing",
+  "name": "simulation",
+  "label": "Simulation",
+  "description": "Component responsible for simulating the pressures of an irrigation system given an input scenario. Optionally, a VAR.csv file resulting from the Variable Optimization component can be provided to iteratively replace the values of the variables preset in the input .inp with those present in the Pareto front approximation.",
+  "license": "MIT",
+  "version": "1.0.0",
+  "dockerImage": "192.168.219.5:8098/smartfood/vre3/simulation:1.0.0",
+  "tags": ["smartfood", "vre3", "epanet", "simulation"],
+  "parameters": [
+    {
+      "name": "--inp-file",
+      "label": "Inp File",
+      "description": "Path to the INP file with the scenario to be analyzed",
+      "defaultValue": "{{.inputs.input_inp.path}}",
+      "readOnly": true,
+      "type": "string"
+    },
+    {
+      "name": "--var-file",
+      "label": "Variable File",
+      "description": "In case you do not want to run the simulation with the values set in the input .inp file, you can replace these values by the values provided in a VAR.csv file as a result of the variable optimization component. (optional)",
+      "defaultValue": "{{.inputs.input_var.path}}",
+      "readOnly": true,
+      "type": "string"
+    },
+    {
+      "name": "--output-folder",
+      "label": "Output Folder",
+      "description": "Path to the output directory",
+      "defaultValue": "/mnt/shared/",
+      "readOnly": true,
+      "type": "string"
+    },
+    {
+      "name": "--str-variables",
+      "label": "Str Variables",
+      "description": "Semicolon-separated variables whose values are to be replaced by those provided in the VAR.csv file. (optional)",
+      "defaultValue": null,
+      "type": "string"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "input_inp",
+      "label": "Input INP file",
+      "path": "/mnt/shared/input.inp",
+      "type": "text"
+    },
+    {
+      "name": "input_var",
+      "label": "Input VAR file",
+      "path": "/mnt/shared/input.csv",
+      "type": "tabulardataset"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output",
+      "label": "Output file",
+      "path": "/mnt/shared/simulated_pressures.zip",
+      "type": "zip"
+    }
+  ],
+  "mainScriptPath": "java-project/src/main/java/epanet/RunnerSimulation.java",
+  "testPath": "java-project/src/test/java/epanet/TestComponent.java",
+  "dependencies": [
+    {
+      "name": "java",
+      "version": "11",
+      "license": "Oracle",
+      "url": "https://www.java.com/"
+    }
+  ],
+  "resources": {
+    "cores": 1,
+    "memory": 128,
+    "gpuNeeded": false,
+    "gpuMemory": null,
+    "estimatedTimeInMin": 4
+  },
+  "publicationDate": "2023-12-07T10:00:00.000Z",
+  "author": {
+    "email": "khaos.research@gmail.com",
+    "affiliation": "Khaos Research Group"
+  },
+  "contributor": [
+    {
+      "email": "adrianseor.99@uma.es",
+      "affiliation": "Khaos Research Group"
+    }
+  ]
+}
