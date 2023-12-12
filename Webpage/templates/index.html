@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Home VR1</title>
+  <link rel="icon" href="{{url_for('static', filename='img/lifewatch-eric.a9ad36fd.svg')}}">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lifewatch_blue: '#0f4e8a',
+            lifewatch_orange: '#ea5b2d',
+            lifewatch_green: '#009138',
+            lifewatch_grey: '#666666',
+            lifewatch_light_grey: '#f2f2f2',
+            lifewatch_light_orange: '#f4992b',
+            lifewatch_turquoise: '#009399',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body>
+
+
+
+
+    <header class="border-b border-slate-200 ">
+        <nav class="mx-auto max-w-[55%] px-4 sm:px-6 md:px-8 my-2 flex items-center justify-between">
+          <div class="relative h-36 w-52">
+
+          </div>
+            <div class="flex space-y-2 grid grid-rows-2 items-center justify-between">
+                <ul>
+                  <li class="float-left"><a class="px-3 underline block decoration-transparent decoration-2 underline-offset-4 transition-colors duration-100 ease-linear hover:decoration-lifewatch_blue" href="{{ url_for('login_page')}}">Home</a></li>
+                  <li class="float-left"><a class="px-3 mx-0.5 underline block decoration-transparent decoration-2 underline-offset-4 transition-colors duration-100 ease-linear hover:decoration-lifewatch_orange" href="{{ url_for('services')}}">Services</a></li>
+                  
+                  {% if hash %}
+                      <li class="group px-3 mx-0.5 flex items-center space-x-2 hover:cursor-pointer"> <img class="h-5 w-5 transform transition-transform ease-linear group-hover:translate-x-0.5" 
+                      src="{{url_for('static', filename='img/in_door_communication_enter_log_in_login_icon_191647.svg')}}" >
+                        <a href="{{ url_for('logout')}}">Logout</a></li>
+                  {%else%}
+                      <li class="group px-3 mx-0.5 flex items-center space-x-2 hover:cursor-pointer"> <img class="h-5 w-5 transform transition-transform ease-linear group-hover:translate-x-0.5" 
+                    src="{{url_for('static', filename='img/in_door_communication_enter_log_in_login_icon_191647.svg')}}" >
+                        <a href="{{ url_for('login')}}">Login</a></li>
+                  {%endif %}
+                </ul>
+                <a class= "border-b border-slate-200"></a>
+                <ul>
+                    <li class="float-left"><a class="px-3 underline block decoration-transparent decoration-2 underline-offset-4 transition-colors duration-100 ease-linear hover:decoration-lifewatch_blue" href="/smartfood-GEE/VRE1/home_VRE">VRE1</a></li>
+                    <li class="float-left"><a class="px-3 mx-0.5 underline block decoration-transparent decoration-2 underline-offset-4 transition-colors duration-100 ease-linear hover:decoration-lifewatch_orange" href="{{ url_for('upload_page') }}">Upload shapefile</a></li>
+                    <li class="float-left"><a class="px-3 mx-0.5 underline block decoration-transparent decoration-2 underline-offset-4 transition-colors duration-100 ease-linear hover:decoration-lifewatch_green" href="{{ url_for('get_status')}}">Data management</a></li>
+                    <li class="float-left"><a class="px-3 mx-0.5 underline block decoration-transparent decoration-2 underline-offset-4 transition-colors duration-100 ease-linear hover:decoration-lifewatch_turquoise" href="{{ url_for('apps')}}">Apps</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+
+    <main class="my-16 space-y-10 mx-auto max-w-[55%] px-4 sm:px-6 md:px-8">
+        <section>
+          <h1 class="text-6xl leading-snug mb-8">
+            <span class="text-lifewatch_blue">Near and remote sensing of agriculture: Sensor integration and connectivity</span> 
+          </h1>
+          <p class="text-lg font-light leading-relaxed tracking-wide w-full">
+            This Web application allows users to analyze geospatial data using their own shapefiles. 
+            It offers two algorithms: time series analysis of spectral indices in the selected area 
+            of interest using SIGPAC terrain separation; and an analysis of the data according to a 
+            classification label that must be included in the shapefile.
+          </p>
+        </section>
+        <section class="grid auto-rows-fr grid-cols-1  gap-12 md:grid-cols-2 flex ">
+            <a class="flex" href="{{ url_for('upload_page')}}">
+                <div class="transform rounded-md border-2 w-full border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex flex-col space-y-4 border-t-lifewatch_orange">
+                        <img class="h-8 w-8 fill-lifewatch_orange" src="{{url_for('static', filename='img/icons8-upload-50.png')}}" >
+                        <p class="text-left cursor-pointer text-3xl leading-snug">Upload shapefile</p>
+                        
+                        <p class="flex-1 text-justify text-lifewatch_grey">
+                        
+                          In this section you will be able to upload your shapefiles as well as to find 
+                          the two available applications.
+                        </p>
+                </div>
+            </a>
+
+            <a class="flex" href="{{ url_for('get_status')}}">
+                <div class="transform rounded-md border-2 w-full mr-0 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex flex-col space-y-4 border-t-lifewatch_green">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="h-8 w-8 fill-lifewatch_green" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                        <p class="text-left cursor-pointer text-3xl leading-snug">Data management</p>
+                        
+                        <p class="flex-1 text-justify text-lifewatch_grey">
+                        
+                          In this section you can check the upload status of all uploaded shapefiles as 
+                          the process may take a few minutes. You will also be able to consult all the 
+                          shapefiles uploaded to the database and you will have the possibility to delete 
+                          them when needed.
+                        </p>
+                </div>
+            </a>
+
+            <a class="flex" href="{{ url_for('apps')}}">
+              <div class="transform rounded-md border-2 w-full mr-0 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex flex-col space-y-4 border-t-lifewatch_blue">
+                <img class="h-8 w-8 fill-lifewatch_orange" src="{{url_for('static', filename='img/icons8-app-64.png')}}" >
+                      <p class="text-left cursor-pointer text-3xl leading-snug">Applications</p>
+                      
+                      <p class="flex-1 text-justify text-lifewatch_grey">
+                      
+                        Check available applications to analyze geospatial data using your own shapefiles.
+                      </p>
+              </div>
+          </a>
+           
+         
+        </section>
+      </main>
+
+
+      <div class="border-t border-slate-200">
+        <footer class="mx-auto max-w-[55%] px-4 sm:px-6 md:px-8 flex flex-col space-y-4">
+            <div class="flex items-center">
+                <div class="w-1/3">
+                    <p class="w-full text-slate-600">Site design © 2023 Khaos Research Group. All rights reserved.</p>
+                    
+                    <p class="w-full text-slate-600">Website content licensed
+                        <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>.
+                    </p>
+                </div>
+                <div class="flex flex-col w-2/3 items-center justify-center">
+                  <div class="w-full flex flex-row  items-center justify-center">
+                      <div class="relative" style="width: 30%;">
+                          <img src="{{url_for('static', filename='img/marcauma.a9b739b5.svg')}}" />
+                      </div>
+                      <div class="relative " style="width: 20%;">
+                          <img src="{{url_for('static', filename='img/Logounicordoba.svg')}}" />
+                      </div>
+                      <div class="relative" style="width: 30%;">
+                        <img src="{{url_for('static', filename='img/logoLW_eric_outline2-01.svg')}}" />
+                      </div>  
+                  
+                    <div class="relative">
+                        <img src="{{url_for('static', filename='img/junta.png')}}" />
+                    </div>
+                    <div class="relative" style="width: 50%;">
+                        <img src="{{url_for('static', filename='img/mci.gob_.web_.jpg')}}" />
+                    </div>
+                    <div class="relative" style="width: 20%;">
+                        <img src="{{url_for('static', filename='img/ue_fedr.png')}}" />
+                    </div>
+                  </div>
+                
+                
+                </div>
+            </div>
+      </footer>
+    </div>
+</body>
+
+
+
+
+
+</html>
