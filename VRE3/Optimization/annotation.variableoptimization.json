@@ -1,0 +1,140 @@
+{
+  "type": "DataAnalysing",
+  "name": "variable-optimization",
+  "label": "Variable Optimization",
+  "description": "Component capable of predicting the values associated with a given variable of the existing connectors in an irrigation system (roughness or monirloss) based on the pressure levels observed at the nodes in the real environment. To do so, it performs an optimization exercise through the JMetal framework focusing its evaluation on the distance found between the real pressure values and those calculated by the well-known simulator called EPANET.",
+  "license": "MIT",
+  "version": "1.0.0",
+  "dockerImage": "192.168.219.5:8098/smartfood/vre3/variableoptimization:1.0.0",
+  "tags": ["smartfood", "vre3", "epanet", "variable-optimization"],
+  "parameters": [
+    {
+      "name": "--inp-file",
+      "label": "INP File",
+      "description": "Path to the INP file with the scenario whose variables want to be optimized to match real pressures with simulated.",
+      "defaultValue": "{{.inputs.input_inp.path}}",
+      "readOnly": true,
+      "type": "string"
+    }, 
+    {
+      "name": "--pressure-file",
+      "label": "Pressure File",
+      "description": "CSV file with the real pressures of the irrigation system.",
+      "defaultValue": "{{.inputs.input_pressure.path}}",
+      "readOnly": true,
+      "type": "string"
+    },
+    {
+      "name": "--output-folder",
+      "label": "Output folder",
+      "description": "Path to the output directory",
+      "defaultValue": "/mnt/shared/",
+      "readOnly": true,
+      "type": "string"
+    },
+    {
+      "name": "--str-fitness-formulas",
+      "label": "Str Fitness Formulas",
+      "description": "Objectives to optimize separated by semicolon. Possible values: SSE, SEHomogeneity, RoughnessHomogeneity, MinorlossHomogeneity",
+      "defaultValue": "SSE;SEHomogeneity;RoughnessHomogeneity",
+      "type": "string"
+    },
+    {
+      "name": "--population-size",
+      "label": "Population Size",
+      "description": "Population size",
+      "defaultValue": "100",
+      "type": "integer"
+    },
+    {
+      "name": "--max-evaluations",
+      "label": "Max Evaluations",
+      "description": "Max number of evaluations",
+      "defaultValue": "25000",
+      "type": "integer"
+    },
+    {
+      "name": "--str-algorithm",
+      "label": "Str Algorithm",
+      "description": "Algorithm as a string. Possible values: GA-AsyncParallel (mono-objective), NSGAII-AsyncParallel (multi-objective), SMPSO-SyncParallel (multi-objective)",
+      "defaultValue": "SMPSO-SyncParallel",
+      "type": "string"
+    },
+    {
+      "name": "--crossover-probability",
+      "label": "Crossover Probability",
+      "description": "Crossover probability",
+      "defaultValue": "0.9",
+      "type": "double"
+    },
+    {
+      "name": "--mutation-probability",
+      "label": "Mutation Probability",
+      "description": "Mutation probability",
+      "defaultValue": "0.1",
+      "type": "double"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "input_inp",
+      "label": "Input INP file",
+      "path": "/mnt/shared/input.inp",
+      "type": "text"
+    },
+    {
+      "name": "input_pressure",
+      "label": "Input csv file with real pressures",
+      "path": "/mnt/shared/input.csv",
+      "type": "tabulardataset"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output_var",
+      "label": "Output VAR file",
+      "path": "/mnt/shared/VAR.csv",
+      "type": "tabulardataset"
+    },
+    {
+      "name": "output_fun",
+      "label": "Output FUN file",
+      "path": "/mnt/shared/FUN.csv",
+      "type": "tabulardataset"
+    },
+    {
+      "name": "output_fitness",
+      "label": "Output fitness evolution file",
+      "path": "/mnt/shared/fitness_evolution.txt",
+      "type": "text"
+    }
+  ],
+  "mainScriptPath": "java-project/src/main/java/epanet/RunnerVariableOptimization.java",
+  "testPath": "java-project/src/test/java/epanet/TestComponent.java",
+  "dependencies": [
+    {
+      "name": "java",
+      "version": "11",
+      "license": "Oracle",
+      "url": "https://www.java.com/"
+    }
+  ],
+  "resources": {
+    "cores": 32,
+    "memory": 512,
+    "gpuNeeded": false,
+    "gpuMemory": null,
+    "estimatedTimeInMin": 1440
+  },
+  "publicationDate": "2023-12-07T10:00:00.000Z",
+  "author": {
+    "email": "khaos.research@gmail.com",
+    "affiliation": "Khaos Research Group"
+  },
+  "contributor": [
+    {
+      "email": "adrianseor.99@uma.es",
+      "affiliation": "Khaos Research Group"
+    }
+  ]
+}

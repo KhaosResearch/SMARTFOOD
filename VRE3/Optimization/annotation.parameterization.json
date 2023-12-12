@@ -1,0 +1,100 @@
+{
+  "type": "DataAnalysing",
+  "name": "parameterization",
+  "label": "Parameterization",
+  "description": "Component responsible for comparing different evolutionary algorithm configurations designed for the Optimization Variable component.",
+  "license": "MIT",
+  "version": "1.0.0",
+  "dockerImage": "192.168.219.5:8098/smartfood/vre3/parameterization:1.0.0",
+  "tags": ["smartfood", "vre3", "epanet", "parameterization"],
+  "parameters": [
+    {
+      "name": "--input-zip",
+      "label": "Input Zip",
+      "description": "ZIP file with the different .inp (irrigation systems) and .csv (real pressures). The files will be paired for sharing the same prefix.",
+      "defaultValue": "{{.inputs.input.path}}",
+      "readOnly": true,
+      "type": "string"
+    },
+    {
+      "name": "--output-dir",
+      "label": "Output directory",
+      "description": "Path to the output directory",
+      "defaultValue": "/mnt/shared/",
+      "readOnly": true,
+      "type": "string"
+    },
+    {
+      "name": "--str-variables",
+      "label": "Str Variables",
+      "description": "Irrigation system variables separated by semicolon that want to be optimized to match real pressures with simulated. Possible values: Roughness, Minorloss",
+      "defaultValue": "Roughness;Minorloss",
+      "type": "string"
+    },
+    {
+      "name": "--str-var-limits",
+      "label": "Str Variable Limits",
+      "description": "Parts per unit that represents the possible margin of values that each variable can take with respect to the pre-existing ones in the .inp input file. The value -1 represents the absence of limits for the variable in question.",
+      "defaultValue": "0.2;-1",
+      "type": "string"
+    },
+    {
+      "name": "--str-fitness-formulas",
+      "label": "Str Fitness Formulas",
+      "description": "Objectives to optimize separated by semicolon. Possible values: SSE, SEHomogeneity, RoughnessHomogeneity, MinorlossHomogeneity",
+      "defaultValue": "SSE;SEHomogeneity",
+      "type": "string"
+    },
+    {
+      "name": "--independent-runs",
+      "label": "Independent Runs",
+      "description": "Number of independent runs",
+      "defaultValue": "7",
+      "type": "integer"
+    }
+  ],
+  "inputs": [
+    {
+      "name": "input",
+      "label": "Input",
+      "path": "/mnt/shared/input.zip",
+      "type": "zip"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output",
+      "label": "Output file",
+      "path": "/mnt/shared/parameterization.zip",
+      "type": "zip"
+    }
+  ],
+  "mainScriptPath": "java-project/src/main/java/epanet/RunnerParameterization.java",
+  "testPath": "java-project/src/test/java/epanet/TestComponent.java",
+  "dependencies": [
+    {
+      "name": "java",
+      "version": "11",
+      "license": "Oracle",
+      "url": "https://www.java.com/"
+    }
+  ],
+  "resources": {
+    "cores": 32,
+    "memory": 512,
+    "gpuNeeded": false,
+    "gpuMemory": null,
+    "estimatedTimeInMin": 1440
+  },
+  "publicationDate": "2023-12-07T10:00:00.000Z",
+  "author": {
+    "email": "khaos.research@gmail.com",
+    "affiliation": "Khaos Research Group"
+  },
+  "contributor": [
+    {
+      "email": "adrianseor.99@uma.es",
+      "affiliation": "Khaos Research Group"
+    }
+  ]
+}
