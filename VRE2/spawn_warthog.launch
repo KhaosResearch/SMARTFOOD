@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="robot_name" default="warthog" />
+  <arg name="tf_prefix" default="w" />
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0" />
+
+  <rosparam command="load" file="$(find warthog_control)/config/control.yaml" />
+  
+  <param name="/$(arg robot_name)/robot_description"
+    command="$(find warthog_description)/scripts/env_run
+      $(find warthog_description)/urdf/configs/base
+      $(find xacro)/xacro $(find warthog_description)/urdf/warthog.urdf.xacro" />
+
+  <node name="warthog_robot_state_publisher" pkg="robot_state_publisher"
+    type="robot_state_publisher">
+    <param name="tf_prefix" value="$(arg tf_prefix)" />
+    <param name="use_tf_static" value="true" />
+  </node>
+
+  <!-- joint_state_publisher is needed to publish the suspension joints. -->
+  <node name="warthog_joint_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+  </node>
+
+  <node name="warthog_controller_spawner" pkg="controller_manager" type="spawner"
+    ns="/$(arg robot_name)" args="warthog_joint_publisher warthog_velocity_controller --timeout 10" />
+
+  <node pkg="robot_localization" type="ekf_localization_node" name="warthog_ekf_localization" />
+
+  <!-- Spawn Warthog -->
+  <node name="warthog_urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+    args="-urdf -model $(arg robot_name) -param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y 0" />
+</launch>
