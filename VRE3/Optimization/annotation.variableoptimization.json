@@ -65,14 +65,14 @@
       "label": "Crossover Probability",
       "description": "Crossover probability",
       "defaultValue": "0.9",
-      "type": "double"
+      "type": "float"
     },
     {
       "name": "--mutation-probability",
       "label": "Mutation Probability",
       "description": "Mutation probability",
       "defaultValue": "0.1",
-      "type": "double"
+      "type": "float"
     }
   ],
   "inputs": [
