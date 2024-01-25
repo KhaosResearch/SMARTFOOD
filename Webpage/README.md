@@ -11,14 +11,14 @@
     6. In the [main service accounts menu](https://console.cloud.google.com/iam-admin/serviceaccounts), click on each of the created service accounts and then "Keys", "Add Key", and "Create new key in JSON format".
     7. Rename the JSON file for the "developer" service account to "gee-cli-key.json" and the "storage" service account to "key.json."
     8. Move both keys to a folder named `credentials/` in the cloned repository.
-6. The last requirement to deploy the website is to have a service implementing OAuth 2.0 in the Python script `oauth.py`. In our case, we have used [Casdoor](https://casdoor.org/docs/how-to-connect/oauth/).
-7. To ensure proper functionality of the app, certain environmental variables must be defined. The environment variables mentioned in the `config.py` file should be specified in a `.env` file located in the `credentials` folder. An example template (`.envtemplate`) has been provided for reference. These variables include *CASDOOR_CLIENT_ID* and *CASDOOR_CLIENT_SECRET*, which only need to be defined if you choose to use Casdoor. If you opt for another service, modify both the `.env` file (for provided values) and `config.py` (for default values) with your service-specific information. *GC_PROJECT_ID* represents the name of the project in the Google Cloud Console. *MAX_FILE_SIZE_IN_BYTES* determines the maximum size allowed for file uploads to the website. Lastly, *APP_SECRET_KEY* is a randomly generated string used for encrypting session cookies.
+6. The last requirement to deploy the website is to have a service implementing OAuth 2.0 in the Python script `oauth.py`. In our case, we have used Keycloak.
+7. To ensure proper functionality of the app, certain environmental variables must be defined. The environment variables mentioned in the `config.py` file should be specified in a `.env` file located in the `credentials` folder. An example template (`.envtemplate`) has been provided for reference. These variables include *KEYCLOAK_CLIENT_ID* and *KEYCLOAK_CLIENT_SECRET*, which only need to be defined if you choose to use Keycloak. If you opt for another service, modify both the `.env` file (for provided values) and `config.py` (for default values) with your service-specific information. *GC_PROJECT_ID* represents the name of the project in the Google Cloud Console. *MAX_FILE_SIZE_IN_BYTES* determines the maximum size allowed for file uploads to the website. Lastly, *APP_SECRET_KEY* is a randomly generated string used for encrypting session cookies.
 8. Finally, we'll build and run the Docker image that runs the website on port (internal is fixed in 8083) with the following commands from the main directory of the cloned repository:
     ```
-    docker build -t app_visualizationgee:1.0.0 -f visualizationGEE.dockerfile .
+    docker build -t app_smartfoodgee:1.0.0 -f smartfoodgee.dockerfile .
     ```
     ```
-    docker run -p 8083:8083 -v $PWD/credentials:/credentials app_visualizationgee:1.0.0
+    docker run -p 8083:8083 -v $PWD/credentials:/credentials app_smartfoodgee:1.0.0
     ```
 
 

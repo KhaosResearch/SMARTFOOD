@@ -21,7 +21,7 @@ from jwt.exceptions import DecodeError
 from werkzeug.exceptions import InternalServerError, Unauthorized
 
 from config import settings
-from oauth import SMRT_CONFIG, get_oauth2_session, get_well_known_metadata, jwks_client
+from oauth import KEYCLOAK_CONFIG, get_oauth2_session, get_well_known_metadata, jwks_client
 from utils import (
     getHash,
     task_with_status,
@@ -44,7 +44,7 @@ with open("credentials/key.json") as source:
 
 storage_credentials = service_account.Credentials.from_service_account_info(info)
 credentials = ee.ServiceAccountCredentials(
-    settings.SERCIVE_ACCOUNT, "credentials/gee-cli-key.json"
+    "", "credentials/gee-cli-key.json"
 )
 ee.Initialize(credentials)
 
@@ -81,7 +81,7 @@ def callback():
 
     session["oauth_token"] = oauth2_session.fetch_token(
         well_known_metadata["token_endpoint"],
-        client_secret=SMRT_CONFIG["client_secret"],
+        client_secret=KEYCLOAK_CONFIG["client_secret"],
         code=request.args["code"],
     )["id_token"]
     token = session["oauth_token"]
@@ -92,7 +92,7 @@ def callback():
             token,
             signing_key.key,
             algorithms=[header_data["alg"]],
-            audience=SMRT_CONFIG["client_id"],
+            audience=KEYCLOAK_CONFIG["client_id"],
         )
         session["email"] = request.user_data["email"]
 

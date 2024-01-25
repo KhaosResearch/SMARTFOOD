@@ -4,8 +4,8 @@ from pydantic import BaseSettings
 
 
 class _Settings(BaseSettings):
-    CASDOOR_CLIENT_ID: str = None
-    CASDOOR_CLIENT_SECRET: str = None
+    KEYCLOAK_CLIENT_ID: str = None
+    KEYCLOAK_CLIENT_SECRET: str = None
     APP_SECRET_KEY: str = None
     GC_PROJECT_ID: str = None
     MAX_FILE_SIZE_IN_BYTES: int = 209715200 
