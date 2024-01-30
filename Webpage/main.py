@@ -70,7 +70,10 @@ def login():
         well_known_metadata["authorization_endpoint"]
     )
     session["oauth_state"] = state
-    session["next_url"] = request.referrer
+    if request.referrer:
+        session["next_url"] = request.referrer
+    else:
+        session["next_url"] = url_for("login_page")
     return redirect(authorization_url)
 
 
