@@ -1,4 +1,4 @@
-var s2 = ee.ImageCollection("COPERNICUS/S2_SR"),
+var s2 = ee.ImageCollection("COPERNICUS/S2_HARMONIZED"),
 sitios = ee.FeatureCollection("projects/<PROJECT-ID>/assets/andalucia/sitios");
 
 var userIdentifier = null;
