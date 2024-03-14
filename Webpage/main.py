@@ -106,26 +106,33 @@ def callback():
     return redirect(session["next_url"])
 
 
-def login_is_required(function):
-    def wrapper(*args, **kwargs):
-        if "email" not in session:
-            return abort(401)
-        else:
-            return function()
-
-    return wrapper
-
-
 @app.route("/services")
 def services():
     return render_template("service.html")
 
 
+def login_is_required(function):
+    def wrapper(*args, **kwargs):
+        if "email" not in session:
+            return abort(401)
+        else:
+            return function(*args, **kwargs)
+
+    return wrapper
+
+def login_is_required_vre2(function):
+    def wrapper_vre2(*args, **kwargs): 
+        if "email" not in session:
+            return abort(401)
+        else:
+            return function(*args, **kwargs)
+
+    return wrapper_vre2  
+
 @app.route("/VRE1/home_VRE", methods=["GET"])
 @login_is_required
 def home_VRE():
     """Endpoint for uploading zip files and uploading them to GEE"""
-
     username = session["email"]
     if request.method == "GET":
         try:
@@ -133,7 +140,6 @@ def home_VRE():
             ee.data.getAsset(
                 f"projects/{settings.GC_PROJECT_ID}/assets/{getHash(username)}"
             )
-
         except ee.ee_exception.EEException:
             parent_asset = ee.data.createAsset(
                 {"type": "FOLDER"},
@@ -145,6 +151,27 @@ def home_VRE():
             print("New user, folder created")
     return render_template("index.html", hash=getHash(username))
 
+@app.route("/VRE2/home_VRE2", methods=["GET"])
+@login_is_required_vre2
+def home_VRE2():
+    """Endpoint for uploading zip files and uploading them to GEE"""
+    username = session["email"]
+    if request.method == "GET":
+        try:
+            # List the content of the path given, if it exits
+            ee.data.getAsset(
+                f"projects/{settings.GC_PROJECT_ID}/assets/{getHash(username)}"
+            )
+        except ee.ee_exception.EEException:
+            parent_asset = ee.data.createAsset(
+                {"type": "FOLDER"},
+                f"projects/{settings.GC_PROJECT_ID}/assets/{getHash(username)}",
+            )
+            assetId = parent_asset["id"]
+            permissions = {"readers": [], "writers": [], "all_users_can_read": True}
+            _ = ee.data.setAssetAcl(assetId, permissions)
+            print("New user, folder created")
+    return render_template("index2.html", hash=getHash(username))
 
 @app.route("/VRE1/upload-shapefile", methods=["GET", "POST"])
 def upload_page():
@@ -255,7 +282,14 @@ def apps():
     else:
         return redirect(url_for("login_page"))
 
-
+@app.route("/VRE2/controller")
+def joystic():
+    if session:
+        username = session["email"]
+        return render_template("joystick.html", hash=getHash(username))
+    else:
+        return redirect(url_for("login_page"))
+    
 @app.route("/logout")
 def logout():
     session.clear()

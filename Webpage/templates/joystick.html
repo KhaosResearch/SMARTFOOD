@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Warthog Joystick</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.js" type="text/javascript"></script>
+</head>
+
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<div class="flex flex-col container mx-auto p-8 h-screen space-y-4">
+    <div class="flex-none space-y-4">
+        <h1 class="text-2xl font-bold text-gray-800">Warthog Joystick</h1>
+        <p class="text-gray-600">Connection status: <span class="font-medium" id="status"></span></p>
+        <label class="block text-gray-600" for="topic">Select a model:</label>
+        <select class="block w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                id="topic">
+            <option disabled selected>Select a topic</option>
+        </select>
+    </div>
+    <button class="flex-none bg-blue-500 hover:bg-blue-700 transition-colors text-white rounded-md text-sm font-medium py-2 px-4"
+            id="import">
+        Import
+    </button>
+    <button class="flex-none bg-red-500 hover:bg-red-700 transition-colors text-white rounded-md text-sm font-medium py-2 px-4"
+            id="record">
+        Record
+    </button>
+    <div class="grow h-screen flex items-center rounded-lg border shadow-inner bg-gray-50">
+        <div id="zone_dynamic"></div>
+    </div>
+</div>
+<script type="text/javascript">
+  let ros;
+  let cmdVelListener;
+
+  let isRecording = false;
+  let recordedMessages = [];
+
+  function initializeRosbridge() {
+    // Setting up ROS connection
+    ros.on('connection', () => {
+      document.getElementById("status").textContent = "Connected";
+    });
+
+    ros.on('error', (error) => {
+      document.getElementById("status").textContent = "Error";
+      console.error('Error connecting to websocket server:', error);
+    });
+
+    ros.on('close', () => {
+      document.getElementById("status").textContent = "Closed";
+    });
+
+    // Function to move the robot
+    const move = (linear, angular) => {
+      const twist = new ROSLIB.Message({
+        linear: {x: linear, y: 0, z: 0},
+        angular: {x: 0, y: 0, z: angular}
+      });
+      if (isRecording) {
+        recordedMessages.push({...twist, timestamp: Date.now()});
+      }
+      cmdVelListener.publish(twist);
+    };
+
+    // Function to create joystick
+    const createJoystick = () => {
+      const options = {
+        zone: document.getElementById('zone_dynamic'),
+        threshold: 0.1,
+        mode: 'static',
+        position: {left: '50%'},
+        color: 'blue',
+      };
+      const manager = nipplejs.create(options);
+
+      const maxLinear = 5.0; // m/s
+      const maxAngular = 2.0; // rad/s
+      const maxDistance = 75.0; // pixels;
+
+      let linearSpeed = 0;
+      let angularSpeed = 0;
+
+      manager.on('start', () => {
+        // Move the robot at 25 Hz.
+        this.timer = setInterval(() => {
+          move(linearSpeed, angularSpeed);
+        }, 25);
+      });
+
+      manager.on('move', (event, nipple) => {
+        linearSpeed = Math.sin(nipple.angle.radian) * maxLinear * nipple.distance / maxDistance;
+        angularSpeed = -Math.cos(nipple.angle.radian) * maxAngular * nipple.distance / maxDistance;
+      });
+
+      manager.on('end', () => {
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        move(0, 0);
+      });
+    };
+
+    createJoystick();
+  }
+
+  function connect() {
+    ros = new ROSLIB.Ros({
+      url: 'ws://gzweb:9090'
+    });
+    ros.getTopics((req) => {
+      const topics = req.topics.filter(topic => topic.includes("/cmd_vel"));
+      // Build the select element
+      const select = document.getElementById("topic");
+      let isFirstOption = true;
+      topics.forEach(topicName => {
+        const option = document.createElement("option");
+        option.value = topicName;
+        option.textContent = topicName;
+        select.appendChild(option);
+      });
+    });
+  }
+
+  /* Update topic listener */
+
+  function setCmdVelListener() {
+    const topicName = document.getElementById("topic").value;
+    // Setting up the cmd_vel listener
+    cmdVelListener = new ROSLIB.Topic({
+      ros,
+      name: topicName,
+      messageType: 'geometry_msgs/Twist'
+    });
+  }
+
+  document.getElementById("topic").addEventListener("change", setCmdVelListener);
+
+  /* Record messages */
+
+  function saveRecordedMessages() {
+    const blob = new Blob([JSON.stringify(recordedMessages, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'recorded_messages.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function toggleRecording() {
+    isRecording = !isRecording;
+    document.getElementById("record").classList.toggle("animate-pulse");
+    document.getElementById("record").textContent = isRecording ? "Stop Recording" : "Record";
+    if (!isRecording) {
+      saveRecordedMessages();
+    } else {
+      recordedMessages = [];
+    }
+  }
+
+  document.getElementById("record").addEventListener("click", toggleRecording);
+
+  /* Play recorded messages */
+
+  function importRecordedMessages(event) {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const contents = e.target.result;
+      const messages = JSON.parse(contents);
+      playRecordedMessages(messages);
+    };
+    reader.readAsText(file);
+  }
+
+  function playRecordedMessages(messages) {
+    if (!messages || !messages.length) {
+      return;
+    }
+    // Assume that messages are ordered by timestamp.
+    const firstTimestamp = messages[0].timestamp;
+    messages.forEach(message => {
+      const delay = message.timestamp - firstTimestamp;
+      setTimeout(() => {
+        sendMovement(message);
+      }, delay);
+    });
+  }
+
+  function sendMovement(message) {
+    const {linear, angular} = message;
+    cmdVelListener.publish({linear, angular});
+  }
+
+  document.getElementById("import").addEventListener("click", function () {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.onchange = importRecordedMessages;
+    fileInput.click();
+  });
+
+  window.onload = function () {
+    connect();
+    setCmdVelListener();
+    initializeRosbridge();
+  };
+</script>
+</body>
+</html>
