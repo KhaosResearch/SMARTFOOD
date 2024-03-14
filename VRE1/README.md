@@ -8,11 +8,10 @@
 6. Click "Create a new Google cloud project" and name the project by filling in the unique "Project-ID" field. If prompted to accept the message "You must accept the Cloud Terms of Service before a Cloud Project can be created", click the link in the prompt and accept the terms of service.
 7. Upon confirmation, you will be redirected to the Earth Engine code editor.
 8. In the code editor, click on "New" and select "Repository." You'll need to confirm a username identifier if you're creating one for the first time and a repository name. Note that either the username or project ID will appear in the URL that Google creates for applications developed in the code editor. The repository name is not that relevant.
-9. Clone the GitHub repository [Khaos-Research/SMARTFOOD](https://github.com/KhaosResearch/SMARTFOOD) using LFS to download the necessary shapefiles.
+9. Clone the GitHub repository [Khaos-Research/SMARTFOOD](https://github.com/KhaosResearch/SMARTFOOD).
 
     ```
-    apt install git-lfs
-    git lfs clone https://github.com/KhaosResearch/SMARTFOOD.git
+    git clone https://github.com/KhaosResearch/SMARTFOOD.git
     ```
     
 10. Run the following command in a terminal from the root directory of the repository to replace project identifiers in the developed scripts with your own. Please replace "YOUR-PROJECT-ID" with your selected project ID in the next command:
@@ -22,7 +21,7 @@
     ```
 
 11. Ensure that the four shapefiles (compressed in .zip) have been downloaded (they will be provided by Khaos). These files are: two SIGPAC files [[LICENSE ref]](https://www.juntadeandalucia.es/organismos/agriculturapescaaguaydesarrollorural/servicios/sigpac/visor/paginas/sigpac-descarga-informacion-geografica-shapes-provincias.html) at the parcel and polygon levels, the boundaries of the provinces of Andalusia, and its ecological sites.
-12. Now, upload the SIGPAC files and Andalusia boundaries to the Google Cloud project. On the left side of the editor, click on "Assets." Click "New" and "Folder." Create the folder with the name "andalucia" in lowercase and without accents. Verify that it appears on the screen upon creation `projects/<PROJECT-ID>/assets/andalucia`.
+12. Now, upload the SIGPAC files and Andalusia boundaries to the Google Cloud project. On the left side of the editor, click on "Assets." Click "New" and "Folder." Create the folder with the name "andalucia" in lowercase and without accents. Verify that it appears on the screen upon creation `projects/<PROJECT-ID>/assets/andalucia`. Then, hover the mouse over the folder and click the "share" buttom that appears. A dialog will open, check "Anyone can read" and press "done". This way we will give public access to files that will be inside the folder.
 13. For each of the four .zip files (`sitios.zip`, `limites.zip`, `andalucia_nv3.zip`, and `andalucia_nv5.zip`), click again on "New," but this time select "Shape files (.shp, .shx, .dbg, .prj, or .zip)." A dialog will open where you will select one of the ".zip" files containing the shapefiles in "Source files." In "Asset ID," add the following identifiers (each respective to its .zip file name):
     - `projects/<PROJECT-ID>/assets/andalucia/limites` selecting the `limites.zip` file in source files.
     - `projects/<PROJECT-ID>/assets/andalucia/andalucia_nv3` selecting the `andalucia_nv3.zip` file in source files.
