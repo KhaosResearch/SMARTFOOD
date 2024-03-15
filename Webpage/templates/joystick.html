@@ -35,6 +35,10 @@
 <script type="text/javascript">
   let ros;
   let cmdVelListener;
+  // Obtener el nombre del contenedor de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const api_endpoint = urlParams.get('endpoint');
+  const websocketUrl = `ws://${api_endpoint}`;
 
   let isRecording = false;
   let recordedMessages = [];
@@ -109,7 +113,7 @@
 
   function connect() {
     ros = new ROSLIB.Ros({
-      url: 'ws://gzweb:9090'
+      url: websocketUrl
     });
     ros.getTopics((req) => {
       const topics = req.topics.filter(topic => topic.includes("/cmd_vel"));

@@ -11,6 +11,7 @@ from flask import (
     flash,
     redirect,
     render_template,
+    render_template_string,
     request,
     session,
     url_for,
@@ -29,6 +30,7 @@ from utils import (
     upload_blob,
     upload_table_to_gee,
 )
+import requests
 
 app = Flask(__name__)
 
@@ -287,6 +289,60 @@ def joystic():
     if session:
         username = session["email"]
         return render_template("joystick.html", hash=getHash(username))
+    else:
+        return redirect(url_for("login_page"))
+    
+@app.route("/VRE2/gazebo")
+def gazebo():
+    if session:
+        username = session["email"]
+        
+        # Realizar la solicitud a la API para obtener el nombre del contenedor
+        response = requests.post('http://192.168.219.22:9010/containers', headers={"X-Api-Key": "s3cr3t"})
+        
+        if response.status_code == 200:
+            container_name = response.text
+            if container_name:
+                # Construir la URL de redirección con el nombre del contenedor
+                redirect_url = f"http://{container_name}.gazebo.test"
+                return redirect(redirect_url)
+            else:
+                return "No se pudo obtener el nombre del contenedor", 500
+        else:
+            return "Error al obtener el nombre del contenedor", 500
+    else:
+        return redirect(url_for("login_page"))
+    
+@app.route("/VRE2/controller_gazebo")
+def controller_gazebo():
+    if session:
+        username = session["email"]
+        
+        # Realizar la solicitud a la API para obtener el nombre del contenedor
+        response = requests.post('http://192.168.219.22:9010/containers', headers={"X-Api-Key": "s3cr3t"})
+        
+        if response.status_code == 200:
+            container_name = response.text
+            if container_name:
+                # Construir la URL de redirección con el nombre del contenedor
+                redirect_url = f"http://{container_name}.gazebo.test"
+                
+                # Construir la URL para la segunda pestaña
+                second_tab_url = f"https://khaos.uma.es/smartfood-GEE/VRE2/controller?endpoint={container_name}.gazebo.test"
+                
+                # Renderizar un template HTML que abrirá las dos pestañas usando JavaScript
+                return render_template_string("""
+                <script>
+                    window.open("{{ redirect_url }}", "_blank");
+                    setTimeout(function() {
+                        window.open("{{ second_tab_url }}", "_blank");
+                    }, 1000);
+                </script>
+                """,redirect_url=redirect_url,second_tab_url=second_tab_url)
+            else:
+                return "No se pudo obtener el nombre del contenedor", 500
+        else:
+            return "Error al obtener el nombre del contenedor", 500
     else:
         return redirect(url_for("login_page"))
     
