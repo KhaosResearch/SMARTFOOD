@@ -296,14 +296,12 @@ def joystic():
 def gazebo():
     if session:
         username = session["email"]
-        
-        # Realizar la solicitud a la API para obtener el nombre del contenedor
-        response = requests.post('http://192.168.219.22:9010/containers', headers={"X-Api-Key": "s3cr3t"})
+        # CAMBIAR LOCALHOST
+        response = requests.post('http://localhost:9010/containers', headers={"X-Api-Key": "s3cr3t"})
         
         if response.status_code == 200:
             container_name = response.text
             if container_name:
-                # Construir la URL de redirección con el nombre del contenedor
                 redirect_url = f"http://{container_name}.gazebo.test"
                 return redirect(redirect_url)
             else:
