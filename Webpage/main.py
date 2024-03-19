@@ -298,24 +298,22 @@ def controller_gazebo():
         username = session["email"]
         response = requests.post(f'http://{settings.GO_GAZEBO_HOST}/containers', headers={"X-Api-Key": "s3cr3t"})
         if response.status_code == 200:
-            container_name = response.text
-            if container_name:
-                api_gazebo = settings.API_GAZEBO.replace("container_name", container_name)
-                redirect_gazebo = settings.REDIRECT_GAZEBO.replace("container_name", container_name)
-                redirect_url = f"http://{redirect_gazebo}"
-                second_tab_url = f"https://{api_gazebo}"
+            url_gazebo = response.text
+            if url_gazebo:
+                redirect_url = f"http://api.{url_gazebo}"
+                redirect_url_api = f"/smartfood-GEE/VRE2/controller?endpoint={url_gazebo}"
                 
                 return render_template_string("""
                 <script>
                     window.open("{{ redirect_url }}", "_blank");
                     setTimeout(function() {
-                        window.open("{{ second_tab_url }}", "_blank");
+                        window.open("{{ redirect_url_api }}", "_blank");
                     }, 1000);
                     setTimeout(function() {
                         window.history.back();
                     }, 2000);
                 </script>
-                """,redirect_url=redirect_url,second_tab_url=second_tab_url)
+                """,redirect_url=redirect_url,redirect_url_api=redirect_url_api)
             else:
                 return "Container error", 500
         else:
