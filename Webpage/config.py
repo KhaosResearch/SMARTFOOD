@@ -10,7 +10,6 @@ class _Settings(BaseSettings):
     GC_PROJECT_ID: str = None
     MAX_FILE_SIZE_IN_BYTES: int = 209715200 
     GO_GAZEBO_HOST: str = None
-    API_GAZEBO: str = None
 
     class Config:
         env_file = "credentials/.env"
