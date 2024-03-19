@@ -11,6 +11,7 @@ class _Settings(BaseSettings):
     MAX_FILE_SIZE_IN_BYTES: int = 209715200 
     GO_GAZEBO_HOST: str = None
     API_GAZEBO: str = None
+    REDIRECT_GAZEBO: str = None
 
     class Config:
         env_file = "credentials/.env"

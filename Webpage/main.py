@@ -296,14 +296,14 @@ def joystick():
 def controller_gazebo():
     if session:
         username = session["email"]
-        
-        response = requests.post('http://{settings.GO_GAZEBO_HOST}/containers', headers={"X-Api-Key": "s3cr3t"})
+        response = requests.post(f'http://{settings.GO_GAZEBO_HOST}/containers', headers={"X-Api-Key": "s3cr3t"})
         if response.status_code == 200:
             container_name = response.text
             if container_name:
-                redirect_url = f"http://{settings.API_GAZEBO}"
-                
-                second_tab_url = f"https://{settings.API_GAZEBO}"
+                api_gazebo = settings.API_GAZEBO.replace("container_name", container_name)
+                redirect_gazebo = settings.REDIRECT_GAZEBO.replace("container_name", container_name)
+                redirect_url = f"http://{redirect_gazebo}"
+                second_tab_url = f"https://{api_gazebo}"
                 
                 return render_template_string("""
                 <script>
