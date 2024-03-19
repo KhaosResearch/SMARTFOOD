@@ -311,6 +311,9 @@ def controller_gazebo():
                     setTimeout(function() {
                         window.open("{{ second_tab_url }}", "_blank");
                     }, 1000);
+                    setTimeout(function() {
+                        window.history.back();
+                    }, 2000);
                 </script>
                 """,redirect_url=redirect_url,second_tab_url=second_tab_url)
             else:
