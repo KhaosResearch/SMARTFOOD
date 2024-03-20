@@ -58,19 +58,12 @@ Install go 1.19:
 sudo snap install go --channel=1.19/stable --classic
 ```
 
-Run Redis server:
-
-```bash
-docker run -d -p 6379:6379 redis
-```
-
-Traefik is used as a reverse proxy to serve the containers. Run with:
+Run `docker-compose.yml` containing Redis server and Traefik. 
+- Redis is used to store the state of the containers.
+- Traefik is used as a reverse proxy to serve the containers.
 
 ```bash
 cd go-gazebo
-```
-
-```bash
 docker compose up -d
 ```
 
