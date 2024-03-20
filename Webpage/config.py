@@ -9,6 +9,7 @@ class _Settings(BaseSettings):
     APP_SECRET_KEY: str = None
     GC_PROJECT_ID: str = None
     MAX_FILE_SIZE_IN_BYTES: int = 209715200 
+    GO_GAZEBO_HOST: str = None
 
     class Config:
         env_file = "credentials/.env"
