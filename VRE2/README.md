@@ -4,7 +4,7 @@ This VRE allows to control several robots in a Gazebo robotics simulator instanc
 
 ## Build
 
-First, you have to build both Docker images (`controller` and `gzweb`) using the following commands:
+First, you have to build both Docker images (`warthog_joystick` and `gzweb`) using the following commands:
 
 ```bash
 docker build -t gzweb .
@@ -16,6 +16,7 @@ docker build -t warthog_joystick:latest .
 ```
 
 ## Quick deployment
+*The quick deployment is optional since it is already integrated with the webpage*
 
 You can modify the environment variables in the `docker-compose.yml` file to change the simulation scenario (`WORLD`) and the number of robots deployed (`N_ROBOTS`).
 The `N_ROBOTS` variable has to be a positive integer greater than 0.
@@ -35,7 +36,8 @@ You can also specify both environment variables using a *.env* file with the `--
 docker compose --env-file .env up
 ```
 
-## Quick usage
+## Quick usage (optional)
+*The quick usage is optional since it is already integrated with the webpage*
 
 The container is configured to launch a Warthog's model in an outdoor simulation environment.
 
@@ -52,34 +54,62 @@ To automate the deployment of the VRE by just pressing a button on the webpage, 
 
 Make sure you have built the `gzweb` image as explained in [build section](#build).
 
-Install go 1.19:
+## Deployment
 
-```bash
-sudo snap install go --channel=1.19/stable --classic
-```
-
-Run `docker-compose.yml` containing Redis server and Traefik. 
+Run `go-gazebo/docker-compose.yml` containing Redis server, Traefik and go-gazebo. 
 - Redis is used to store the state of the containers.
 - Traefik is used as a reverse proxy to serve the containers.
+- go-gazebo is the provisioner.
 
 ```bash
 cd go-gazebo
 docker compose up -d
 ```
 
-## Usage
+## Go-gazebo parameters
 
-Build `go-gazebo` binary:
-
-```bash
-sudo make build
-```
-
-You can check the parameters to configure using the `-h` flag. For example host and port to listen, container time to live, pool size, and maximum number of containers.
+When the docker compose is launched, the go-gazebo server is executed with the following parameters:
 
 ```bash
-./go-gazebo -h  # for help
+./go-gazebo -api-key s3cr3t \ 
+    -container-image gzweb:latest \
+    -container-ttl 120 \
+    -host 0.0.0.0 \
+    -max-containers 3 \
+    -pool-size 1 \
+    -port 9010 \
+    -redis-host redis \
+    -redis-port 6379 \
+    -traefik-http-router-domain gazebo.test
 ```
+
+This should be changed in the `go-gazebo/docker-compose.yml` according to your needs. The default values and the description of each parameter are:
+
+```
+  -api-key string
+        Authentication API key for the server (default "s3cr3t")
+  -container-image string
+        Docker image to use for the container (default "gzweb:latest")
+  -container-ttl int
+        Time to live for the container in seconds (default 300)
+  -host string
+        Host address to listen on (default "0.0.0.0")
+  -max-containers int
+        Maximum number of running containers allowed (default 3)
+  -pool-size int
+        Number of warm containers to maintain in the pool. (default 1)
+  -port string
+        Port to listen on (default "9010")
+  -redis-host string
+        Host address of the Redis server (default "localhost")
+  -redis-password string
+        Password for the Redis server
+  -redis-port string
+        Port of the Redis server (default "6379")
+  -traefik-http-router-domain string
+        Domain to use for the container (default "gazebo.test")
+```
+
 An example of usage where the server listens on `localhost:9010`, the container time to live is 120 seconds, 2 containers are created initially, and the maximum number of containers running at the same time is 4:
 
 ```bash

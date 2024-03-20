@@ -4,7 +4,7 @@ services:
   app:
     build: .
     container_name: go-gazebo
-    command: -redis-host redis -container-ttl 120 -pool-size 1 -max-containers 10
+    command: -api-key s3cr3t -container-image gzweb:latest -container-ttl 120 -host 0.0.0.0 -max-containers 3 -pool-size 1 -port 9010 -redis-host redis -redis-port 6379 -traefik-http-router-domain gazebo.test
     ports:
       - 9010:9010
     volumes:
