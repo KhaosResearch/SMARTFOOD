@@ -300,8 +300,8 @@ def controller_gazebo():
         if response.status_code == 200:
             url_gazebo = response.text
             if url_gazebo:
-                redirect_url = f"http://api.{url_gazebo}"
-                redirect_url_api = f"/smartfood-GEE/VRE2/controller?endpoint={url_gazebo}"
+                redirect_url = f"http://{url_gazebo}"
+                redirect_url_api = f"/smartfood-GEE/VRE2/controller?endpoint=api.{url_gazebo}"
                 
                 return render_template_string("""
                 <script>
