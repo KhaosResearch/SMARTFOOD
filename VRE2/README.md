@@ -141,5 +141,7 @@ where `container-name` is the name of the container, e.g., [http://serene_burnel
 When accesing the containers from another machine, you need to resolve the `.test` top-level domain to the IP address of the host machine. You can do this with [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html) (replace `<host-ip>` with the IP address of the host machine):
 
 ```bash
-$ echo 'address=/.test/<host-ip>' >> /etc/dnsmasq.conf
+sudo su
+echo 'address=/.test/<host-ip>' >> /etc/dnsmasq.conf
+echo 'resolv-file=/run/systemd/resolve/resolv.conf' >> /etc/dnsmasq.conf
 ```

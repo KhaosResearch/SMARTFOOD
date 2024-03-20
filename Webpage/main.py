@@ -315,9 +315,9 @@ def controller_gazebo():
                 </script>
                 """,redirect_url=redirect_url,redirect_url_api=redirect_url_api)
             else:
-                return "Container error", 500
+                return "Max number of containers reached. Try again later.", 500
         else:
-            return "Container error", 500
+            return "Max number of containers reached. Try again later.", 500
     else:
         return redirect(url_for("login_page"))
     

@@ -56,7 +56,7 @@ func createContainerConfig() ContainerOpts {
 				"%s-service", ws,
 			),
 			fmt.Sprintf("traefik.http.services.%s-service.loadbalancer.server.port", ws): "9090",
-			"traefik.docker.network": "traefik",
+			"traefik.docker.network": "traefik-net",
 		},
 	}
 	// The network must be the same as the one used by Traefik
