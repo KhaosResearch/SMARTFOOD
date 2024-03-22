@@ -300,20 +300,16 @@ def controller_gazebo():
         if response.status_code == 200:
             url_gazebo = response.text
             if url_gazebo:
-                redirect_url = f"http://{url_gazebo}"
                 redirect_url_api = f"/smartfood-GEE/VRE2/controller?endpoint=api.{url_gazebo}"
                 
                 return render_template_string("""
                 <script>
-                    window.open("{{ redirect_url }}", "_blank");
-                    setTimeout(function() {
-                        window.open("{{ redirect_url_api }}", "_blank");
-                    }, 1000);
+                    window.open("{{ redirect_url_api }}", "_blank");
                     setTimeout(function() {
                         window.history.back();
-                    }, 2000);
+                    }, 1000);
                 </script>
-                """,redirect_url=redirect_url,redirect_url_api=redirect_url_api)
+                """,redirect_url_api=redirect_url_api)
             else:
                 return "Max number of containers reached. Try again later.", 500
         else:
