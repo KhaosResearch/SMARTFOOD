@@ -63,15 +63,7 @@
         </div>
         <div class="grid auto-rows-fr gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
           {% if session %}
-            <a href="/smartfood-GEE/VRE1/home_VRE" class="flex">
-                <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_blue">
-                  <p class="text-left cursor-pointer text-lifewatch_blue text-3xl leading-snug">Near and remote sensing of agriculture: Sensor integration and connectivity</p>
-                  <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6">
-                    VRE that allows access to information in almost real time, as well as in historical series, to the different sources of information offered by the Sentinel constellations for an area of interest (AOI) defined by the user: RADAR images (Sentinel 1), optical images (Sentinel 2) and emission and concentration of gases in the atmosphere (Sentinel 5).
-                  </p>
-                  
-                </div>
-            </a>
+            
             <a href="/smartfood-GEE/VRE2/home_VRE2" class="flex">
               <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_orange">
                 <p class="text-left cursor-pointer text-lifewatch_orange text-3xl leading-snug">Autonomous vehicles, automation and robotization</p>
@@ -80,15 +72,27 @@
                 </p>
               </div>
           </a>
+          <a href="/smartfood-GEE/VRE1/home_VRE" class="flex">
+            <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_blue">
+              <p class="text-left cursor-pointer text-lifewatch_blue text-3xl leading-snug">Near and remote sensing of agriculture: Sensor integration and connectivity</p>
+              <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6">
+                VRE that allows access to information in almost real time, as well as in historical series, to the different sources of information offered by the Sentinel constellations for an area of interest (AOI) defined by the user: RADAR images (Sentinel 1), optical images (Sentinel 2) and emission and concentration of gases in the atmosphere (Sentinel 5).
+              </p>
+              
+            </div>
+        </a>
+          <a href="/smartfood-GEE/OpenTwins/home_OpenTwins" class="flex">
+            <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_turquoise">
+              <p class="text-left text-lifewatch_turquoise cursor-pointer text-3xl leading-snug">Open twins</p>
+              <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6">
+                Innovative open-source platform that specializes in developing next-gen compositional digital twins.
+              </p>
+              <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6"> 
+                Allows for executing a simulation in an already created digital twin of an irrigation machine (PIVOT) with different parameters and accessing real-time metrics using a Grafana dashboard.
+              </p>
+            </div>
+        </a>
             {%else%}
-            <a href="{{ url_for('login')}}" class="flex">
-              <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_blue">
-                <p class="text-left cursor-pointer text-lifewatch_blue text-3xl leading-snug">Near and remote sensing of agriculture: Sensor integration and connectivity</p>
-                <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6">
-                  VRE that allows access to information in almost real time, as well as in historical series, to the different sources of information offered by the Sentinel constellations for an area of interest (AOI) defined by the user: RADAR images (Sentinel 1), optical images (Sentinel 2) and emission and concentration of gases in the atmosphere (Sentinel 5).
-                </p>
-              </div>
-            </a>
             <a href="{{ url_for('login')}}" class="flex">
               <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_orange">
                 <p class="text-left cursor-pointer text-lifewatch_orange text-3xl leading-snug">Autonomous vehicles, automation and robotization</p>
@@ -97,6 +101,25 @@
                 </p>
               </div>
           </a>
+          <a href="{{ url_for('login')}}" class="flex">
+            <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_blue">
+              <p class="text-left cursor-pointer text-lifewatch_blue text-3xl leading-snug">Near and remote sensing of agriculture: Sensor integration and connectivity</p>
+              <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6">
+                VRE that allows access to information in almost real time, as well as in historical series, to the different sources of information offered by the Sentinel constellations for an area of interest (AOI) defined by the user: RADAR images (Sentinel 1), optical images (Sentinel 2) and emission and concentration of gases in the atmosphere (Sentinel 5).
+              </p>
+            </div>
+          </a>
+          <a href="{{ url_for('login')}}" class="flex">
+            <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_turquoise">
+              <p class="text-left text-lifewatch_turquoise cursor-pointer text-3xl leading-snug">Open twins</p>
+              <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6">
+                Innovative open-source platform that specializes in developing next-gen compositional digital twins.
+              </p>
+              <p className="flex-1 text-justify text-lifewatch_grey line-clamp-6"> 
+                Allows for executing a simulation in an already created digital twin of an irrigation machine (PIVOT) with different parameters and accessing real-time metrics using a Grafana dashboard.
+              </p>
+            </div>
+        </a>
             {%endif %}
             <a href="https://github.com/KhaosResearch/SMARTFOOD/tree/main/VRE3" class="flex">
               <div class="transform rounded-md border-2 border-lifewatch_light_grey p-6 transition ease-linear hover:scale-105 flex w-full flex-col space-y-4 border-t-lifewatch_green">
@@ -106,6 +129,7 @@
                 </p>
               </div>
           </a>
+
         </div>
       </main>
 

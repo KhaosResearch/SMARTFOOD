@@ -131,6 +131,15 @@ def login_is_required_vre2(function):
 
     return wrapper_vre2  
 
+def login_is_required_open_twins(function):
+    def wrapper_open_twins(*args, **kwargs): 
+        if "email" not in session:
+            return abort(401)
+        else:
+            return function(*args, **kwargs)
+
+    return wrapper_open_twins  
+
 @app.route("/VRE1/home_VRE", methods=["GET"])
 @login_is_required
 def home_VRE():
@@ -174,6 +183,15 @@ def home_VRE2():
             _ = ee.data.setAssetAcl(assetId, permissions)
             print("New user, folder created")
     return render_template("index2.html", hash=getHash(username))
+
+@app.route("/OpenTwins/home_OpenTwins", methods=["GET"])
+@login_is_required_open_twins
+def home_twins():
+    if session:
+        username = session["email"]
+        return render_template("index3.html",hash=getHash(username))
+    else:
+        return redirect(url_for("login_page"))
 
 @app.route("/VRE1/upload-shapefile", methods=["GET", "POST"])
 def upload_page():
