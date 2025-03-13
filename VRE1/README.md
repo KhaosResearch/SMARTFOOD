@@ -35,3 +35,6 @@
     4. Click `run` to validate the application's functionality. If everything is fine, it will run in development mode. Note that some applications need to have files uploaded, and their functionality cannot be checked until the following steps are completed. At the end of the deployment, they will be tested again with uploaded files.
     5. Click on "Apps" and then "New App." Select your project when asked for "Editing access," so the app's URL will be `<PROJECT-ID>.projects.earthengine.app`. The app's name must be the same as the `.js` file in the repository. For example, the app's name for the `Smartfood_GEE_column_S1.js` file should be `Smartfood_GEE_column_S1`. From `App source code`, select `repository script path` and fill in with the script's name in the `Earth Engine code editor`. Finally, click on `Publish`.
 16. The VRE1 part is completed. Follow the instructions in the `Webpage/` folder to deploy the Smartfood general website, which allows uploading files and testing the applications.
+
+
+This VR was clonned from the GitHub repository [Khaos-Research/smartfood-GEE](https://github.com/KhaosResearch/smartfood-GEE).
